@@ -1,0 +1,5 @@
+error-code:
+  EXIT_CODE_1: Invalid URL, URL often looks like https://some.website.com
+  EXIT_CODE_2: You have not entered URL, enter URL according to the principle /track [URL]
+  EXIT_CODE_3: Invalid command signature, to view the description, enter the command /help
+  EXIT_CODE_4: You have not entered URL, enter URL according to the principle /untrack [URL]\n\n

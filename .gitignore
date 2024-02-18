@@ -30,3 +30,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### yml and properties ###
+bot/src/main/resources/application.yml
+
+### logo ###
+BotLogo.png
+BotDescriptionLogo.gif
