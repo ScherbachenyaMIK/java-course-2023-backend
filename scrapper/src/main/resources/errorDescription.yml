@@ -1,0 +1,4 @@
+error-code:
+  EXIT_CODE_1: Github error! Field updated_at or id not found!
+  EXIT_CODE_2: String date don't parsed to OffsetDateTime format!
+  EXIT_CODE_3: StackOverflow error! Field last_activity_date or question_id not found!
