@@ -1,59 +1,58 @@
 package edu.java.web;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.java.responseDTO.GitHubResponse;
 import edu.java.util.ClientErrorCode;
-import edu.java.util.ExceptionLogger;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 // We need to know owner and repository name
-public class GitHubClient extends WebSiteClient {
+@Slf4j
+public class GitHubClient {
+    private final WebClient webClient;
 
     @Autowired
     ClientErrorCode errorCode;
-    ExceptionLogger logger = new ExceptionLogger();
 
-
-    @Autowired
-    public GitHubClient(WebClient.Builder webClientBuilder) {
-        super(webClientBuilder, "https://api.github.com");
+    @SuppressWarnings("ParameterName")
+    public GitHubClient(WebClient.Builder webClientBuilder, String URL) {
+        this.webClient = webClientBuilder.baseUrl(URL).build();
     }
 
-    @Override
-    protected Pair<String, String> fetchData(Mono<String> mono) {
-        return mono.map(jsonString -> {
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode jsonNode = mapper.readTree(jsonString);
-
-                String date = jsonNode.get("updated_at").asText();
-                String identifier = jsonNode.get("id").asText();
-
-                return Pair.of(date, identifier);
-            } catch (Exception e) {
-                String code = "EXIT_CODE_1";
-                String errorMessage = errorCode.getClientErrorCode(code);
-                logger.logRequest(code, errorMessage);
-                return Pair.of("", "");
-            }
-        }).block();
-    }
-
-    @Override
-    protected OffsetDateTime parseDate(String date) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
-            return OffsetDateTime.parse(date, formatter);
-        } catch (Exception e) {
-            String code = "EXIT_CODE_2";
-            String errorMessage = errorCode.getClientErrorCode(code);
-            logger.logRequest(code, errorMessage);
-            return null;
+    public void logRequest(char thread, String messageCode, String request) {
+        switch (thread) {
+            case 'e' -> log.error(
+                String.format(
+                    errorCode.getClientErrorCode(messageCode)
+                        + " with https://api.github.com. In function "
+                        + Thread.currentThread().getStackTrace()[2],
+                        request));
+            case 'i' -> log.info("Info request");
+            case 'w' -> log.warn("Warn request");
+            default -> log.error("Invalid thread argument");
         }
+    }
+
+    @SuppressWarnings("MultipleStringLiterals")
+    public GitHubResponse getResponse(String owner, String repo) {
+        try {
+            return webClient.get()
+                .uri("/repos/{owner}/{repo}", owner, repo)
+                .retrieve()
+                .bodyToMono(GitHubResponse.class).block();
+        } catch (WebClientResponseException.NotFound e) {
+            logRequest('e', "EXIT_CODE_404",
+                String.format("/repos/%s/%s", owner, repo));
+        } catch (WebClientResponseException.BadRequest e) {
+            logRequest('e', "EXIT_CODE_400",
+                String.format("/repos/%s/%s", owner, repo)
+            );
+        } catch (WebClientResponseException e) {
+            logRequest('e', "EXIT_CODE_1",
+                String.format("/repos/%s/%s", owner, repo));
+        }
+        return new GitHubResponse("-1", OffsetDateTime.MIN);
     }
 }

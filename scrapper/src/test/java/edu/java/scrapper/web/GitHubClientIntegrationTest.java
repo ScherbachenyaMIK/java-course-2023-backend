@@ -2,27 +2,35 @@ package edu.java.scrapper.web;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import edu.java.util.UserResponse;
+import edu.java.responseDTO.GitHubResponse;
 import edu.java.web.GitHubClient;
-import edu.java.web.WebSiteClient;
-import java.lang.reflect.Field;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.reactive.function.client.WebClient;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.junit.Assert.assertEquals;
 
+@SpringBootTest
 public class GitHubClientIntegrationTest {
+    private final GitHubClient gitHubClient;
     private static final int PORT = 8089;
     private static final String HOST = "localhost";
+    private static final String OWNER = "owner";
+    private static final String REPO = "repo";
     private WireMockServer wireMockServer;
+
+    @Autowired
+    public GitHubClientIntegrationTest(GitHubClient gitHubClient) {
+        this.gitHubClient = gitHubClient;
+    }
 
     @BeforeEach
     public void setUp() {
@@ -39,38 +47,18 @@ public class GitHubClientIntegrationTest {
     @Test
     public void testGetResponse() {
         // Making of stubs for request to GitHub API
-        stubFor(get(urlEqualTo("/repos/owner/repo"))
+        stubFor(get(urlEqualTo(String.format("/repos/%s/%s", OWNER, REPO)))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withBody("{\"updated_at\": \"2022-02-24T10:30:00Z\", \"id\": \"123456\"}")));
-        stubFor(get(urlEqualTo("/repos/owner/another_repo"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"updated_at\": \"2020-05-05T11:24:53Z\", \"id\": \"234567\"}")));
 
         // Making of object GitHubClient with URL our WireMock server
-        GitHubClient gitHubClient = new GitHubClient(WebClient.builder());
+        GitHubClient gitHubClient = new GitHubClient(WebClient.builder(), "http://" + HOST + ":" + PORT);
 
-        // Adding of URLs to client
-        gitHubClient.addURL("/repos/owner/repo");
-        gitHubClient.addURL("/repos/owner/another_repo");
-
-        // Getting of private field webClient
-        Field webClient;
-        try {
-            webClient = WebSiteClient.class.getDeclaredField("webClient");
-        webClient.setAccessible(true);
-        webClient.set(gitHubClient,
-            WebClient.builder().baseUrl("http://" + HOST + ":" + PORT).build());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        List <UserResponse> responses = gitHubClient.getResponse();
+        GitHubResponse response = gitHubClient.getResponse(OWNER, REPO);
 
         // Checking for results
-        assertEquals(2, responses.size());
-        assertEquals(OffsetDateTime.of(
+        Assertions.assertEquals(OffsetDateTime.of(
             2022,
             2,
             24,
@@ -78,21 +66,16 @@ public class GitHubClientIntegrationTest {
             30,
             0,
             0,
-            ZoneOffset.UTC),
-            responses.get(0).getTime());
-        assertEquals("123456",
-            responses.get(0).getIdentifier());
-        assertEquals(OffsetDateTime.of(
-                2020,
-                5,
-                5,
-                11,
-                24,
-                53,
-                0,
-                ZoneOffset.UTC),
-            responses.get(1).getTime());
-        assertEquals("234567",
-            responses.get(1).getIdentifier());
+            ZoneOffset.UTC), response.updatedAt());
+        Assertions.assertEquals("123456", response.id());
+    }
+
+    @Test
+    public void testGetResponseCrash() {
+        GitHubResponse response = gitHubClient.getResponse(OWNER, REPO);
+
+        // Checking for results
+        Assertions.assertEquals("-1", response.id());
+        Assertions.assertEquals(OffsetDateTime.MIN, response.updatedAt());
     }
 }

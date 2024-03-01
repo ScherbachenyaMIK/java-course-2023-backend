@@ -17,6 +17,6 @@ public class ClientErrorCode {
     }
 
     public String getClientErrorCode(String exitCode) {
-        return properties.getProperty(String.valueOf(exitCode));
+        return properties.getProperty(exitCode);
     }
 }

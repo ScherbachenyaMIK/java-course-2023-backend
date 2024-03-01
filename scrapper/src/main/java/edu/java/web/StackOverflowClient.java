@@ -1,76 +1,60 @@
 package edu.java.web;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.java.responseDTO.StackOverflowResponse;
 import edu.java.util.ClientErrorCode;
-import edu.java.util.ExceptionLogger;
-import edu.java.util.UserResponse;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 // We need to know only question id
-public class StackOverflowClient extends WebSiteClient {
+@Slf4j
+public class StackOverflowClient {
+    private final WebClient webClient;
 
     @Autowired
     ClientErrorCode errorCode;
-    ExceptionLogger logger = new ExceptionLogger();
 
-    @Autowired
-    public StackOverflowClient(WebClient.Builder webClientBuilder) {
-        super(webClientBuilder, "https://api.stackexchange.com/2.3");
+    @SuppressWarnings("ParameterName")
+    public StackOverflowClient(WebClient.Builder webClientBuilder, String URL) {
+        this.webClient = webClientBuilder.baseUrl(URL).build();
     }
 
-    @Override
-    public List<UserResponse> getResponse() {
-        List<UserResponse> responses = new ArrayList<>();
-        for (var path : pathList) {
-            Pair<String, String> pair = fetchData(getMono(
-                path + "?order=desc&sort=activity&site=stackoverflow"));
-            responses.add(new UserResponse(parseDate(pair.getLeft()), pair.getRight()));
+    public void logRequest(char thread, String messageCode, String id) {
+        switch (thread) {
+            case 'e' -> log.error(
+                String.format(
+                    errorCode.getClientErrorCode(messageCode)
+                        + " with https://api.stackexchange.com/2.2. In function "
+                        + Thread.currentThread().getStackTrace()[2],
+                    id));
+            case 'i' -> log.info("Info request");
+            case 'w' -> log.warn("Warn request");
+            default -> log.error("Invalid thread argument");
         }
-        return responses;
     }
 
-    @Override
-    protected Pair<String, String> fetchData(Mono<String> mono) {
-        return mono.map(jsonString -> {
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode jsonNode = mapper.readTree(jsonString);
-
-                JsonNode itemsNode = jsonNode.get("items");
-                if (itemsNode != null && itemsNode.isArray() && !itemsNode.isEmpty()) {
-                    JsonNode itemNode = itemsNode.get(0);
-                    String date = itemNode.get("last_activity_date").asText();
-                    String identifier = itemNode.get("question_id").asText();
-                    return Pair.of(date, identifier);
-                } else {
-                    return Pair.of("", "");
-                }
-            } catch (Exception e) {
-                String code = "EXIT_CODE_3";
-                String errorMessage = errorCode.getClientErrorCode(code);
-                logger.logRequest(code, errorMessage);
-                return Pair.of("", "");
-            }
-        }).block();
-    }
-
-    @Override
-    protected OffsetDateTime parseDate(String date) {
+    @SuppressWarnings("MultipleStringLiterals")
+    public StackOverflowResponse getResponse(String id) {
         try {
-            long unixTimestamp = Long.parseLong(date);
-            return OffsetDateTime.ofInstant(java.time.Instant.ofEpochSecond(unixTimestamp), java.time.ZoneOffset.UTC);
-        } catch (NumberFormatException e) {
-            String code = "EXIT_CODE_2";
-            String errorMessage = errorCode.getClientErrorCode(code);
-            logger.logRequest(code, errorMessage);
-            return null;
+        return webClient.get()
+            .uri("/questions/{id}?order=desc&sort=activity&site=stackoverflow", id)
+            .retrieve()
+            .bodyToMono(StackOverflowResponse.class)
+            .block();
+        } catch (
+            WebClientResponseException.NotFound e) {
+            logRequest('e', "EXIT_CODE_404",
+                String.format("/questions/%s", id));
+        } catch (
+            WebClientResponseException.BadRequest e) {
+            logRequest('e', "EXIT_CODE_400",
+                String.format("/questions/%s", id));
+        } catch (WebClientResponseException e) {
+            logRequest('e', "EXIT_CODE_1",
+                String.format("/questions/%s", id));
         }
+        return new StackOverflowResponse("-1", OffsetDateTime.MIN);
     }
 }

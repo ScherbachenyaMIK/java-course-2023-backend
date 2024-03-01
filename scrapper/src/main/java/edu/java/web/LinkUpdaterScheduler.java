@@ -1,26 +1,23 @@
 package edu.java.web;
 
-import edu.java.util.InfoLogger;
-import edu.java.util.ResponseHandler;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class LinkUpdaterScheduler {
+    @Autowired
+    private GitHubClient gitHubClient;
 
     @Autowired
-    private List<WebSiteClient> webSiteClientList;
+    private StackOverflowClient stackOverflowClient;
 
-    @Autowired
-    private InfoLogger infoLogger;
-
+    @SuppressWarnings("MultipleStringLiterals")
     @Scheduled(fixedDelayString = "#{T(java.util.concurrent.TimeUnit).SECONDS.toMillis('${app.scheduler.interval}')}")
     public void update() {
-        for (var webSiteClient : webSiteClientList) {
-            infoLogger.logRequest(webSiteClient.getClass());
-            ResponseHandler.handleResponses(webSiteClient.getResponse());
-        }
+        log.info("{} executing task...", gitHubClient.getClass().getSimpleName());
+        log.info("{} executing task...", stackOverflowClient.getClass().getSimpleName());
     }
 }

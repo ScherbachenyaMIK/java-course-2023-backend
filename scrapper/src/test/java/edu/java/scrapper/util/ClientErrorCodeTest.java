@@ -1,9 +1,8 @@
 package edu.java.scrapper.util;
 
+import edu.java.util.ClientErrorCode;
 import java.io.IOException;
 import java.util.Properties;
-
-import edu.java.util.ClientErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -29,20 +28,14 @@ class ClientErrorCodeTest {
     }
 
     @Test
-    void getCommandErrorCodeForCode2() {
-        assertEquals(properties.getProperty("EXIT_CODE_2"),
-            commandErrorCode.getClientErrorCode("EXIT_CODE_2"));
+    void getCommandErrorCodeForCode400() {
+        assertEquals(properties.getProperty("EXIT_CODE_400"),
+            commandErrorCode.getClientErrorCode("EXIT_CODE_400"));
     }
 
     @Test
-    void getCommandErrorCodeForCode3() {
-        assertEquals(properties.getProperty("EXIT_CODE_3"),
-            commandErrorCode.getClientErrorCode("EXIT_CODE_3"));
-    }
-
-    @Test
-    void getCommandErrorCodeForCode4() {
-        assertEquals(properties.getProperty("EXIT_CODE_4"),
-            commandErrorCode.getClientErrorCode("EXIT_CODE_4"));
+    void getCommandErrorCodeForCode404() {
+        assertEquals(properties.getProperty("EXIT_CODE_404"),
+            commandErrorCode.getClientErrorCode("EXIT_CODE_404"));
     }
 }
