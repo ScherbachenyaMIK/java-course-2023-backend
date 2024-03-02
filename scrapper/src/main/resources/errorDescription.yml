@@ -1,0 +1,4 @@
+error-code:
+  EXIT_CODE_1: Error while making request for %s
+  EXIT_CODE_400: 400 Bad Request for request %s
+  EXIT_CODE_404: 404 resource Not Found for request %s
