@@ -32,7 +32,7 @@ build/
 .vscode/
 
 ### yml and properties ###
-bot/src/main/resources/application.yml
+/bot/src/main/resources/application.yml
 
 ### logo ###
 BotLogo.png
