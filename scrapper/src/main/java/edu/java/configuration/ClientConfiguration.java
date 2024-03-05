@@ -1,5 +1,6 @@
 package edu.java.configuration;
 
+import edu.java.web.BotClient;
 import edu.java.web.GitHubClient;
 import edu.java.web.StackOverflowClient;
 import org.springframework.context.annotation.Bean;
@@ -17,5 +18,10 @@ public class ClientConfiguration {
     @Bean
     public StackOverflowClient stackOverflowClient(WebClient.Builder webClientBuilder) {
         return new StackOverflowClient(webClientBuilder, "https://api.stackexchange.com/2.2");
+    }
+
+    @Bean
+    public BotClient botClient(WebClient.Builder webClientBuilder) {
+        return new BotClient(webClientBuilder, "http://localhost:8090");
     }
 }

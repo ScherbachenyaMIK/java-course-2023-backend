@@ -1,8 +1,8 @@
 package edu.java.bot.service;
 
 import com.pengrad.telegrambot.model.Message;
-import edu.java.bot.commands.Command;
-import edu.java.bot.commands.CommandList;
+import edu.java.bot.command.Command;
+import edu.java.bot.command.CommandList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
