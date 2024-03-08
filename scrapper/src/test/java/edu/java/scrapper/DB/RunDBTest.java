@@ -14,9 +14,11 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.postgresql.util.PSQLException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -39,20 +41,20 @@ public class RunDBTest {
 
     @Test
     public void checkChatTable() throws SQLException {
-        long expectedChatId = 1L;
-        String expectedUsername = "ScherbachenyaMIK";
+        long expectedId = 1L;
+        long expectedChatId = 15648564L;
 
         PreparedStatement insertStatement = connection.prepareStatement(
-            "INSERT INTO Chat (username) VALUES (?)");
-            insertStatement.setString(1, expectedUsername);
+            "INSERT INTO Chat (chat_id) VALUES (?)");
+            insertStatement.setLong(1, expectedChatId);
             insertStatement.executeUpdate();
 
         ResultSet resultSet = connection.prepareStatement("SELECT * FROM Chat;").executeQuery();
         assertTrue(resultSet.next());
         long resultId = resultSet.getLong("id");
-        String resultUsername = resultSet.getString("username");
-        assertEquals(expectedChatId, resultId);
-        assertEquals(expectedUsername, resultUsername);
+        long resultChatID = resultSet.getLong("chat_id");
+        assertEquals(expectedId, resultId);
+        assertEquals(expectedChatId, resultChatID);
         assertFalse(resultSet.next());
     }
 
@@ -104,12 +106,12 @@ public class RunDBTest {
     }
 
     @Test
-    @Order(value = Integer.MAX_VALUE)
+    @Order(value = Integer.MAX_VALUE - 1)
     public void joinTest() throws SQLException {
         long expectedLinkId = 1L;
         String expectedLink = "https://github.com/ScherbachenyaMIK/java-course-2023-backend";
         OffsetDateTime expectedTime = OffsetDateTime.now();
-        String username = "ScherbachenyaMIK";
+        long chatId = 15648564L;
 
         PreparedStatement selectionStatement = connection.prepareStatement(
             """
@@ -117,9 +119,9 @@ public class RunDBTest {
                     FROM Chat c
                     JOIN Chat_Link cl ON c.id = cl.chat_id
                     JOIN Link l ON cl.link_id = l.id
-                    WHERE c.username = (?);
+                    WHERE c.chat_id = (?);
                     """);
-        selectionStatement.setString(1, username);
+        selectionStatement.setLong(1, chatId);
         ResultSet resultSet = selectionStatement.executeQuery();
         assertTrue(resultSet.next());
         long resultId = resultSet.getLong("id");
@@ -133,5 +135,16 @@ public class RunDBTest {
         assertEquals(expectedTime.truncatedTo(ChronoUnit.SECONDS),
             resultTime.truncatedTo(ChronoUnit.SECONDS));
         assertFalse(resultSet.next());
+    }
+
+    @Test
+    @Order(value = Integer.MAX_VALUE)
+    public void uniqueTest() throws SQLException {
+        long expectedChatId = 15648564L;
+
+        PreparedStatement insertStatement = connection.prepareStatement(
+            "INSERT INTO Chat (chat_id) VALUES (?)");
+        insertStatement.setLong(1, expectedChatId);
+        assertThrows(PSQLException.class, insertStatement::executeUpdate);
     }
 }
