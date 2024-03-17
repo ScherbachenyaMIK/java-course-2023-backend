@@ -2,17 +2,22 @@ package edu.java.bot.command;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.model.requestDTO.LinkRequest;
 import edu.java.bot.util.CommandErrorCode;
 import edu.java.bot.util.Link;
+import edu.java.bot.web.ScrapperClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Component
 @Order(value = 3)
 public class TrackCommand implements FunctionalCommand {
+    @Autowired
+    private ScrapperClient scrapperClient;
     @Autowired
     private CommandErrorCode commandErrorCode;
 
@@ -34,13 +39,20 @@ public class TrackCommand implements FunctionalCommand {
     }
 
     @Override
+    @SuppressWarnings("MagicNumber")
     public SendMessage handle(Update update) {
         // Start tracking link
+        String url = update.message().text().substring(7);
+        try {
+            scrapperClient.postLinks(update.message().chat().id(), new LinkRequest(URI.create(url)));
+        } catch (WebClientResponseException.BadRequest e) {
+            return new SendMessage(update.message().chat().id(),
+                "Sorry, this url is not supported now, you can add "
+                    + "either github repository url or stackoverflow question url ");
+        }
         return new SendMessage(update.message().chat().id(),
             """
-                  Command is recognized
-
-                  You enter command /track!
+                  New url for tracking is added to a tracking list!
                   """);
     }
 

@@ -4,21 +4,31 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.web.ScrapperClient;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class StartCommandTest {
-    StartCommand startCommand = new StartCommand();
+    @Mock
+    ScrapperClient scrapperClient;
+    @InjectMocks
+    StartCommand startCommand;
 
     @Test
     void command() {
+        MockitoAnnotations.openMocks(this);
         assertEquals("/start", startCommand.command());
     }
 
     @Test
     void description() {
+        MockitoAnnotations.openMocks(this);
         assertEquals("Initiates the bots operation. "
             + "Upon entering this command, the bot starts its operation "
             + "and is ready to accept further instructions.",
@@ -28,12 +38,16 @@ class StartCommandTest {
 
     @Test
     void handle() {
+        MockitoAnnotations.openMocks(this);
+
         Update mockUpdate = mock(Update.class);
         Message mockMessage = mock(Message.class);
         Chat mockChat = mock(Chat.class);
 
         when(mockUpdate.message()).thenReturn(mockMessage);
         when(mockMessage.chat()).thenReturn(mockChat);
+        when(mockChat.id()).thenReturn(1L);
+        when(scrapperClient.postTgChatId(1L)).thenReturn(HttpStatus.OK);
 
         SendMessage sendMessage = startCommand.handle(mockUpdate);
         String actualMessage = sendMessage.getParameters().get("text").toString();

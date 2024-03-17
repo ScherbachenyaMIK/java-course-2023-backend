@@ -10,4 +10,7 @@
 	<include file="01-create-table-chat.sql"/>
     <include file="02-create-table-link.sql"/>
     <include file="03-create-table-chat_link.sql"/>
+	<include file="04-alter-table-link-add-coloumn-last-seen.sql"/>
+	<include file="05-alter-table-link-add-coloumn-last-seen-2.sql"/>
+	<include file="06-create-trigger-delete-orphan-links.sql"/>
 </databaseChangeLog>

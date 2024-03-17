@@ -2,19 +2,26 @@ package edu.java.bot.command;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.model.requestDTO.LinkRequest;
 import edu.java.bot.util.CommandErrorCode;
 import edu.java.bot.util.Link;
+import edu.java.bot.web.ScrapperClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Component
 @Order(value = 4)
 public class UntrackCommand implements FunctionalCommand {
     @Autowired
     private CommandErrorCode commandErrorCode;
+    @Autowired
+    private ScrapperClient scrapperClient;
+    @Autowired
+    ListCommand listCommand;
 
     @Override
     public String command() {
@@ -35,13 +42,25 @@ public class UntrackCommand implements FunctionalCommand {
     }
 
     @Override
+    @SuppressWarnings("MagicNumber")
     public SendMessage handle(Update update) {
         // End tracking link
+        String url = update.message().text().substring(9);
+        try {
+            scrapperClient.deleteLinks(update.message().chat().id(), new LinkRequest(URI.create(url)));
+        } catch (WebClientResponseException.BadRequest e) {
+            return new SendMessage(update.message().chat().id(),
+                "Sorry, this url is not supported now, you can add "
+                    + "either github repository url or stackoverflow question url ");
+        } catch (WebClientResponseException.NotFound e) {
+            return new SendMessage(update.message().chat().id(),
+                """
+                      This url is not tracked yet
+                      """);
+        }
         return new SendMessage(update.message().chat().id(),
             """
-                  Command is recognized
-
-                  You enter command /untrack!
+                  The bot will no longer track this url
                   """);
     }
 
@@ -72,10 +91,10 @@ public class UntrackCommand implements FunctionalCommand {
         // Taking message in accordance with exit code
         String message = commandErrorCode.getCommandErrorCode(exitCode);
         if (exitCode.equals("EXIT_CODE_4")) {
-            message += new ListCommand().handle(update)
-                                        .getParameters()
-                                        .get("text")
-                                        .toString();
+            message += listCommand.handle(update)
+                                    .getParameters()
+                                    .get("text")
+                                    .toString();
             return new SendMessage(update.message().chat().id(),
                 message);
         }
