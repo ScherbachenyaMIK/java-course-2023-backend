@@ -34,7 +34,7 @@ public class ScrapperClient {
                 .uri("/tg-chat/{id}", id)
                 .header("id", id.toString())
                 .retrieve()
-                .toEntity(ResponseEntity.class)
+                .toEntity(Void.class)
                 .block())
             .getStatusCode();
     }
