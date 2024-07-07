@@ -1,4 +1,4 @@
-package edu.java.DB.DTO;
+package edu.java.DB.jdbc.DTO;
 
 import java.net.URI;
 import java.time.OffsetDateTime;

@@ -1,7 +1,7 @@
 package edu.java.web;
 
-import edu.java.DB.DTO.ChatDTO;
-import edu.java.DB.DTO.LinkDTO;
+import edu.java.DB.jdbc.DTO.ChatDTO;
+import edu.java.DB.jdbc.DTO.LinkDTO;
 import edu.java.responseDTO.BotRequest;
 import edu.java.responseDTO.GitHubResponse;
 import edu.java.responseDTO.StackOverflowResponse;

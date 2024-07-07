@@ -1,15 +1,15 @@
-package edu.java.service.jdbc;
+package edu.java.scrapper.service.jdbc;
 
-import edu.java.DB.DAO.ChatDAO;
-import edu.java.DB.DAO.ChatLinkDAO;
-import edu.java.DB.DAO.LinkDAO;
-import edu.java.DB.DTO.ChatDTO;
-import edu.java.DB.DTO.LinkDTO;
+import edu.java.DB.jdbc.DAO.ChatDAO;
+import edu.java.DB.jdbc.DAO.ChatLinkDAO;
+import edu.java.DB.jdbc.DAO.LinkDAO;
+import edu.java.DB.jdbc.DTO.ChatDTO;
+import edu.java.DB.jdbc.DTO.LinkDTO;
 import edu.java.exception.LinkNotFoundException;
 import edu.java.exception.NoSuchUserRegisteredException;
 import edu.java.responseDTO.GitHubResponse;
 import edu.java.responseDTO.StackOverflowResponse;
-import edu.java.scrapper.IntegrationTest;
+import edu.java.service.jdbc.JdbcLinkService;
 import edu.java.web.GitHubClient;
 import edu.java.web.StackOverflowClient;
 import java.net.URI;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class JdbcLinkServiceTest extends IntegrationTest {
+class JdbcLinkServiceTest {
 
     @Mock
     private LinkDAO linkDAO;
@@ -70,7 +70,7 @@ class JdbcLinkServiceTest extends IntegrationTest {
         LinkDTO addedLink = jdbcLinkService.add(tgChatId, url);
 
         assertNotNull(addedLink);
-        assertThat(notExistingLink).isEqualTo(notExistingLink);
+        assertThat(addedLink).isEqualTo(notExistingLink);
 
         verify(linkDAO, times(1)).addLink(url, notExistingLink.lastUpdate());
     }

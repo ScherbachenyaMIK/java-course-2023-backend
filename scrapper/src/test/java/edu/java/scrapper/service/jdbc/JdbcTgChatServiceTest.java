@@ -1,9 +1,9 @@
-package edu.java.service.jdbc;
+package edu.java.scrapper.service.jdbc;
 
-import edu.java.DB.DAO.ChatDAO;
+import edu.java.DB.jdbc.DAO.ChatDAO;
 import edu.java.exception.NoSuchUserRegisteredException;
 import edu.java.exception.UserAlreadyRegisteredException;
-import edu.java.scrapper.IntegrationTest;
+import edu.java.service.jdbc.JdbcTgChatService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class JdbcTgChatServiceTest extends IntegrationTest {
+class JdbcTgChatServiceTest {
 
     @Mock
     private ChatDAO chatDAO;

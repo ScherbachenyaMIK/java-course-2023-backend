@@ -1,10 +1,10 @@
-package edu.java.scrapper.DB;
+package edu.java.scrapper.DB.jdbc;
 
-import edu.java.DB.DAO.ChatDAO;
-import edu.java.DB.DAO.ChatLinkDAO;
-import edu.java.DB.DAO.LinkDAO;
-import edu.java.DB.DTO.ChatDTO;
-import edu.java.DB.DTO.LinkDTO;
+import edu.java.DB.jdbc.DAO.ChatDAO;
+import edu.java.DB.jdbc.DAO.ChatLinkDAO;
+import edu.java.DB.jdbc.DAO.LinkDAO;
+import edu.java.DB.jdbc.DTO.ChatDTO;
+import edu.java.DB.jdbc.DTO.LinkDTO;
 import edu.java.scrapper.IntegrationTest;
 import java.net.URI;
 import java.net.URISyntaxException;

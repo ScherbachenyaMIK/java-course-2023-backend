@@ -1,6 +1,7 @@
-package edu.java.DB.DAO;
+package edu.java.DB.jdbc.DAO;
 
-import edu.java.DB.DTO.ChatLinkDTO;
+import edu.java.DB.jdbc.DTO.ChatLinkDTO;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,14 +16,14 @@ public class ChatLinkDAO {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void addChatLink(long chatId, long linkId) {
+    public void addChatLink(@NotNull long chatId, @NotNull long linkId) {
         jdbcTemplate.update(
             "INSERT INTO Chat_Link (chat_id, link_id) VALUES (?, ?)",
             chatId,
             linkId);
     }
 
-    public void removeChatLink(long chatId, long linkId) {
+    public void removeChatLink(@NotNull long chatId, @NotNull long linkId) {
         jdbcTemplate.update(
             "DELETE FROM Chat_Link WHERE chat_id = ? AND link_id = ?",
             chatId,

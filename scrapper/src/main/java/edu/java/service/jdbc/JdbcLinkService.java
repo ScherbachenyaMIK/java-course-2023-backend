@@ -1,10 +1,10 @@
 package edu.java.service.jdbc;
 
-import edu.java.DB.DAO.ChatDAO;
-import edu.java.DB.DAO.ChatLinkDAO;
-import edu.java.DB.DAO.LinkDAO;
-import edu.java.DB.DTO.ChatDTO;
-import edu.java.DB.DTO.LinkDTO;
+import edu.java.DB.jdbc.DAO.ChatDAO;
+import edu.java.DB.jdbc.DAO.ChatLinkDAO;
+import edu.java.DB.jdbc.DAO.LinkDAO;
+import edu.java.DB.jdbc.DTO.ChatDTO;
+import edu.java.DB.jdbc.DTO.LinkDTO;
 import edu.java.exception.LinkNotFoundException;
 import edu.java.exception.NoSuchUserRegisteredException;
 import edu.java.responseDTO.GitHubResponse;
@@ -17,10 +17,8 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
 public class JdbcLinkService implements LinkService {
     @Autowired
     LinkDAO linkDAO;

@@ -1,7 +1,8 @@
-package edu.java.DB.DAO;
+package edu.java.DB.jdbc.DAO;
 
-import edu.java.DB.DTO.ChatDTO;
-import edu.java.DB.DTO.LinkDTO;
+import edu.java.DB.jdbc.DTO.ChatDTO;
+import edu.java.DB.jdbc.DTO.LinkDTO;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Timestamp;
@@ -20,12 +21,12 @@ public class LinkDAO {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void addLink(URI url, OffsetDateTime lastUpdate) {
+    public void addLink(@NotNull URI url, @NotNull OffsetDateTime lastUpdate) {
         jdbcTemplate.update("INSERT INTO Link (link, last_update) VALUES (?, ?)", url.toString(),
             Timestamp.from(lastUpdate.toInstant()));
     }
 
-    public void removeLink(URI url) {
+    public void removeLink(@NotNull URI url) {
         jdbcTemplate.update("DELETE FROM Link WHERE link = ?", url.toString());
     }
 
@@ -114,7 +115,8 @@ public class LinkDAO {
         );
     }
 
-    public void updateLink(Long linkId, OffsetDateTime lastUpdate, OffsetDateTime lastSeen) {
+    public void updateLink(@NotNull Long linkId,
+        @NotNull OffsetDateTime lastUpdate, @NotNull OffsetDateTime lastSeen) {
         jdbcTemplate.update("""
                                     UPDATE Link
                                     SET last_update = (?), last_seen = (?)

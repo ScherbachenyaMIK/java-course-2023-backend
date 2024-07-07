@@ -1,7 +1,8 @@
-package edu.java.DB.DAO;
+package edu.java.DB.jdbc.DAO;
 
-import edu.java.DB.DTO.ChatDTO;
-import edu.java.DB.DTO.LinkDTO;
+import edu.java.DB.jdbc.DTO.ChatDTO;
+import edu.java.DB.jdbc.DTO.LinkDTO;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -19,11 +20,11 @@ public class ChatDAO {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void addChat(long chatId) {
+    public void addChat(@NotNull long chatId) {
         jdbcTemplate.update("INSERT INTO Chat (chat_id) VALUES (?)", chatId);
     }
 
-    public void removeChat(long chatId) {
+    public void removeChat(@NotNull long chatId) {
         jdbcTemplate.update("DELETE FROM Chat WHERE chat_id = ?", chatId);
     }
 
