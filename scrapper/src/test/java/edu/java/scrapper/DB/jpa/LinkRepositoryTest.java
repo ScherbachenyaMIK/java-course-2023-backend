@@ -266,9 +266,13 @@ class LinkRepositoryTest extends IntegrationTest {
         link2.setLink("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend2");
         link3.setLink("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend3");
 
-        link1.setLastUpdate(Timestamp.from(OffsetDateTime.now().plusHours(1).toInstant()));
-        link2.setLastUpdate(Timestamp.from(OffsetDateTime.now().minusMinutes(3).toInstant()));
-        link3.setLastUpdate(Timestamp.from(OffsetDateTime.now().minusMinutes(4).toInstant()));
+        link1.setLastUpdate(Timestamp.from(OffsetDateTime.now().toInstant()));
+        link2.setLastUpdate(Timestamp.from(OffsetDateTime.now().toInstant()));
+        link3.setLastUpdate(Timestamp.from(OffsetDateTime.now().toInstant()));
+
+        link1.setLastSeen(Timestamp.from(OffsetDateTime.now().plusHours(1).toInstant()));
+        link2.setLastSeen(Timestamp.from(OffsetDateTime.now().minusMinutes(3).toInstant()));
+        link3.setLastSeen(Timestamp.from(OffsetDateTime.now().minusMinutes(4).toInstant()));
 
         linkRepository.save(link1);
         linkRepository.save(link2);
@@ -334,47 +338,5 @@ class LinkRepositoryTest extends IntegrationTest {
 
         assertThat(result.contains(chat1)).isFalse();
         assertThat(result.contains(chat2)).isTrue();
-    }
-
-    //TODO перенести потом в сервис
-    @Transactional
-    @Rollback
-    @Test
-    void updateLink() {
-        Link link1 = new Link();
-        link1.setLink("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend");
-        link1.setLastUpdate(Timestamp.from(OffsetDateTime.now().minusHours(1).toInstant()));
-
-        linkRepository.save(link1);
-
-        link1 = linkRepository.findLinkByLink(
-            "https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend");
-        Timestamp now = Timestamp.from(Instant.now());
-
-        Link expected = new Link();
-        expected.setId(link1.getId());
-        expected.setLink(link1.getLink());
-        expected.setLastUpdate(now);
-        expected.setLastSeen(now);
-
-        assertFalse(
-            link1.getLastUpdate().toInstant().until(now.toInstant(),
-            ChronoUnit.SECONDS) <= 1);
-
-        link1.setLastUpdate(now);
-        link1.setLastSeen(now);
-        linkRepository.flush();
-
-        link1 = linkRepository.findLinkByLink(
-            "https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend");
-
-        assertThat(link1)
-            .usingRecursiveComparison()
-            .ignoringFieldsOfTypes(Timestamp.class)
-            .isEqualTo(expected);
-        assertTrue(link1.getLastUpdate().toInstant().until(now.toInstant(),
-            ChronoUnit.SECONDS) <= 1);
-        assertTrue(link1.getLastSeen().toInstant().until(now.toInstant(),
-            ChronoUnit.SECONDS) <= 1);
     }
 }

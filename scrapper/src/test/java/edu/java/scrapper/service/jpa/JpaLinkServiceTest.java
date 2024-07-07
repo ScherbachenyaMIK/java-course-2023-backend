@@ -168,6 +168,7 @@ public class JpaLinkServiceTest {
         assertThrows(NoSuchUserRegisteredException.class, () -> jpaLinkService.remove(tgChatId, url));
     }
 
+    @Test
     void listAll_ReturnsListOfLinks() {
         long tgChatId = 1L;
         OffsetDateTime now = OffsetDateTime.now();
@@ -281,6 +282,6 @@ public class JpaLinkServiceTest {
 
         jpaLinkService.updateLink(linkId, lastUpdate, lastSeen);
 
-        verify(linkRepository, times(1)).flush();
+        verify(linkRepository, times(1)).saveAndFlush(link);
     }
 }

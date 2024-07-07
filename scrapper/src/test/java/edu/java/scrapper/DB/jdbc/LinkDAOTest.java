@@ -170,19 +170,32 @@ public class LinkDAOTest extends IntegrationTest {
     @Rollback
     @Test
     void findAllLinksWithFilter() {
+        OffsetDateTime now = OffsetDateTime.now();
         connectionLink.addLink(
             URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend"),
-            OffsetDateTime.now().plusHours(1));
+            now);
         connectionLink.addLink(
             URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend2"),
-            OffsetDateTime.now().minusMinutes(3));
+            now);
         connectionLink.addLink(
             URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend3"),
-            OffsetDateTime.now().minusMinutes(4));
+            now);
         LinkDTO firstLink = connectionLink.findLinkByURI(
             URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend2"));
         LinkDTO secondLink = connectionLink.findLinkByURI(
             URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend3"));
+        LinkDTO thirdLink = connectionLink.findLinkByURI(
+            URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend"));
+
+        connectionLink.updateLink(firstLink.id(), now, now.minusMinutes(3));
+        connectionLink.updateLink(secondLink.id(), now, now.minusMinutes(4));
+        connectionLink.updateLink(thirdLink.id(), now, now.plusHours(1));
+
+        firstLink = connectionLink.findLinkByURI(
+            URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend2"));
+        secondLink = connectionLink.findLinkByURI(
+            URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend3"));
+
         List<LinkDTO> expected = new ArrayList<>();
         expected.add(firstLink);
         expected.add(secondLink);

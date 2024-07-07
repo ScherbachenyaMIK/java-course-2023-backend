@@ -22,10 +22,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
 public class JpaLinkService implements LinkService {
     @Autowired
     LinkRepository linkRepository;
@@ -120,7 +118,7 @@ public class JpaLinkService implements LinkService {
         Link link = linkRepository.findLinkById(linkId);
         link.setLastUpdate(Timestamp.from(lastUpdate.toInstant()));
         link.setLastSeen(Timestamp.from(lastSeen.toInstant()));
-        linkRepository.flush();
+        linkRepository.saveAndFlush(link);
     }
 
     private void addLinkByLinkAndLastUpdate(String link, Timestamp lastUpdate) {

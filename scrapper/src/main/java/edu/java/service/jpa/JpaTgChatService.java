@@ -6,10 +6,8 @@ import edu.java.exception.NoSuchUserRegisteredException;
 import edu.java.exception.UserAlreadyRegisteredException;
 import edu.java.service.TgChatService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
 public class JpaTgChatService implements TgChatService {
     @Autowired
     ChatRepository chatRepository;

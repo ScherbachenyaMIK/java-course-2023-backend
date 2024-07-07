@@ -2,11 +2,15 @@ package edu.java.scrapper.service;
 
 import edu.java.DB.jdbc.DTO.ChatDTO;
 import edu.java.DB.jdbc.DTO.LinkDTO;
+import edu.java.DB.jpa.model.Link;
+import edu.java.DB.jpa.repository.LinkRepository;
 import edu.java.exception.NoSuchUserRegisteredException;
 import edu.java.scrapper.IntegrationTest;
 import edu.java.service.LinkService;
 import edu.java.service.TgChatService;
 import java.net.URI;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -28,10 +32,13 @@ public class ServiceIntegrationTest extends IntegrationTest {
     @Autowired
     private TgChatService tgChatService;
 
+    @Autowired
+    private LinkRepository linkRepository;
+
     @Transactional
     @Rollback
     @Test
-    void IntegrationTest() throws InterruptedException {
+    void IntegrationTest() {
         List<Long> chatIDs = List.of(123L, 132L, 213L, 231L, 312L, 321L);
         chatIDs.forEach(tgChatService::register);
 
@@ -51,7 +58,12 @@ public class ServiceIntegrationTest extends IntegrationTest {
         );
         linksURIs.forEach(item -> linkService.add(item.getLeft(), item.getRight()));
 
-        Thread.sleep(61000);
+        List<Link> allLinks = linkRepository.findAll();
+        allLinks.forEach(item -> item.setLastSeen(Timestamp
+            .from(Instant.now()
+                .minusSeconds(86400L)
+            )));
+        allLinks.forEach(item -> linkRepository.saveAndFlush(item));
 
         List<LinkDTO> linksForUpdate = linkService.listAllByFilter();
 
@@ -71,7 +83,7 @@ public class ServiceIntegrationTest extends IntegrationTest {
         linkService.updateLink(
             linksForUpdate.get(2).id(),
             OffsetDateTime.now(),
-            OffsetDateTime.now().plusHours(1)
+            OffsetDateTime.now().plusDays(1)
         );
 
         List<LinkDTO> linksForUpdateAfterUpdate = linkService.listAllByFilter();
@@ -82,7 +94,7 @@ public class ServiceIntegrationTest extends IntegrationTest {
             .ignoringCollectionOrder()
             .isEqualTo(linksForUpdate
                 .stream()
-                .filter(item -> item.id() != linksForUpdate.get(2).id())
+                .filter(item -> !Objects.equals(item.id(), linksForUpdate.get(2).id()))
                 .collect(Collectors.toList()));
 
         LinkDTO linkForSearch = linksForUpdate
