@@ -1,6 +1,6 @@
 package edu.java.scrapper.controller;
 
-import edu.java.DB.DTO.LinkDTO;
+import edu.java.DB.jdbc.DTO.LinkDTO;
 import edu.java.exception.LinkNotFoundException;
 import edu.java.exception.NoSuchUserRegisteredException;
 import edu.java.exception.UserAlreadyRegisteredException;

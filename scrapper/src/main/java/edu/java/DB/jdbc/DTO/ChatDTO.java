@@ -1,4 +1,4 @@
-package edu.java.DB.DTO;
+package edu.java.DB.jdbc.DTO;
 
 public record ChatDTO(
     Long id,

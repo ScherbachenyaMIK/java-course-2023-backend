@@ -24,6 +24,8 @@ jobs:
           cache: maven
 
       - name: maven build
+        env:
+            TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: mvn -pl bot -am package
 
       - id: jacoco

@@ -1,11 +1,10 @@
 package edu.java.service;
 
-import edu.java.DB.DTO.ChatDTO;
-import edu.java.DB.DTO.LinkDTO;
+import edu.java.DB.jdbc.DTO.ChatDTO;
+import edu.java.DB.jdbc.DTO.LinkDTO;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface LinkService {
     LinkDTO add(long tgChatId, URI url);
@@ -18,5 +17,5 @@ public interface LinkService {
 
     List<ChatDTO> listChatsForLink(Long linkId);
 
-    @Transactional void updateLink(Long linkId, OffsetDateTime lastUpdate, OffsetDateTime lastSeen);
+    void updateLink(Long linkId, OffsetDateTime lastUpdate, OffsetDateTime lastSeen);
 }

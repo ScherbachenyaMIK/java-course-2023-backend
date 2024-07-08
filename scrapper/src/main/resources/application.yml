@@ -3,6 +3,7 @@ app:
     enable: true
     interval: 10
     force-check-delay: 10
+  database-access-type: jpa
 
 spring:
   application:
@@ -14,7 +15,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   liquibase:
     enabled: false
-    
+
 server:
   port: 8080
 
