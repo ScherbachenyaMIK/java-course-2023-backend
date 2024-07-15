@@ -10,6 +10,7 @@ import com.pengrad.telegrambot.response.BaseResponse;
 import edu.java.bot.command.Command;
 import edu.java.bot.command.FunctionalCommand;
 import edu.java.bot.command.HelpCommand;
+import edu.java.bot.command.StopCommand;
 import edu.java.bot.configuration.ApplicationConfig;
 import edu.java.bot.exception.ListenerExceptionHandler;
 import java.util.List;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Component;
 public class CustomTelegramBot implements Bot {
     @Autowired
     private List<FunctionalCommand> commandList;
+
+    @Autowired
+    private StopCommand stopCommand;
 
     private final TelegramBot bot;
 
@@ -39,6 +43,13 @@ public class CustomTelegramBot implements Bot {
         Command command;
         // Processing all of updates
         for (Update update : updates) {
+            if (update.myChatMember() != null
+                && update.myChatMember().newChatMember().user().username()
+                .equals("url_notifications_tracking_bot")
+                && update.myChatMember().newChatMember().status().name()
+                .equals("kicked")) {
+                stopCommand.handle(update);
+            }
             if (update.message() != null) {
                 command = MessageHandler.handleMessage(update.message());
                 if (command != null) {

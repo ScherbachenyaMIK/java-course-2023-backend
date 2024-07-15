@@ -7,6 +7,7 @@ import edu.java.model.responseDTO.LinkResponse;
 import edu.java.model.responseDTO.ListLinksResponse;
 import edu.java.service.LinkService;
 import edu.java.service.TgChatService;
+import io.github.bucket4j.Bucket;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,22 +35,33 @@ public class ScrapperController {
     @Autowired
     private TgChatService tgChatService;
 
+    @Autowired
+    private Bucket bucket;
+
     @PostMapping("/links")
     public ResponseEntity<?> addLink(@RequestHeader("Tg-Chat-Id") Long tgChatId,
         @Valid @RequestBody AddLinkRequest request) {
-        linkService.add(tgChatId, request.link());
-        return ResponseEntity.ok().build();
+        if (bucket.tryConsume(1)) {
+            linkService.add(tgChatId, request.link());
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
     }
 
     @GetMapping("/links")
     public ResponseEntity<ListLinksResponse> getAllLinks(@RequestHeader("Tg-Chat-Id") Long tgChatId) {
-        List<LinkResponse> trackedLinks = linkService.listAll(tgChatId)
-            .stream()
-            .map(link -> new LinkResponse(link.id(), link.url()))
-            .toList();
+        if (bucket.tryConsume(1)) {
+            List<LinkResponse> trackedLinks = linkService.listAll(tgChatId)
+                .stream()
+                .map(link -> new LinkResponse(link.id(), link.url()))
+                .toList();
 
-        ListLinksResponse response = new ListLinksResponse(trackedLinks, trackedLinks.size());
-        return ResponseEntity.ok(response);
+            ListLinksResponse response = new ListLinksResponse(trackedLinks, trackedLinks.size());
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
     }
 
     @ApiResponses(value = {
@@ -60,8 +72,12 @@ public class ScrapperController {
     @DeleteMapping("/links")
     public ResponseEntity<?> removeLink(@RequestHeader("Tg-Chat-Id") Long tgChatId,
         @Valid @RequestBody RemoveLinkRequest request) {
-        linkService.remove(tgChatId, request.link());
-        return ResponseEntity.ok().build();
+        if (bucket.tryConsume(1)) {
+            linkService.remove(tgChatId, request.link());
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -72,8 +88,12 @@ public class ScrapperController {
     })
     @PostMapping("/tg-chat/{id}")
     public ResponseEntity<?> registerChat(@PathVariable("id") Long id) {
-        tgChatService.register(id);
-        return ResponseEntity.ok().build();
+        if (bucket.tryConsume(1)) {
+            tgChatService.register(id);
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -84,7 +104,11 @@ public class ScrapperController {
     })
     @DeleteMapping("/tg-chat/{id}")
     public ResponseEntity<?> deleteChat(@PathVariable("id") Long id) {
-        tgChatService.unregister(id);
-        return ResponseEntity.ok().build();
+        if (bucket.tryConsume(1)) {
+            tgChatService.unregister(id);
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
     }
 }

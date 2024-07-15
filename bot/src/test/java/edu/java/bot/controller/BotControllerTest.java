@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class BotControllerTest {
@@ -67,6 +68,28 @@ public class BotControllerTest {
                 .retrieve()
                 .toEntity(Void.class)
                 .block());
+    }
+
+    @Test
+    public void testProcessUpdateTooManyRequests() throws URISyntaxException {
+        LinkUpdateRequest request = new LinkUpdateRequest(1L,
+                new URI("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend"),
+                "Test description", new ArrayList<>());
+
+        try {
+            for(int i = 0; i < 40; ++i) {
+                webClient.post()
+                        .uri("/updates")
+                        .bodyValue(request)
+                        .retrieve()
+                        .toEntity(Void.class)
+                        .block();
+            }
+            fail();
+        }
+        catch (WebClientResponseException.TooManyRequests ignored) {
+
+        }
     }
 }
 

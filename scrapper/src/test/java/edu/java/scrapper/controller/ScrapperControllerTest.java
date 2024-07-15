@@ -17,11 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -32,11 +36,13 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ScrapperControllerTest {
 
@@ -356,5 +362,29 @@ class ScrapperControllerTest {
                 .retrieve()
                 .bodyToMono(ApiErrorResponse.class)
                 .block());
+    }
+
+    @Order(Ordered.LOWEST_PRECEDENCE)
+    @Test
+    void deleteChatTooManyTimes() {
+        Long id = 1L;
+        doNothing().when(tgChatService).unregister(id);
+
+        try {
+            for (int i = 0; i < 40; ++i) {
+                webClient.delete()
+                        .uri("/tg-chat/{id}", id)
+                        .header("id", id.toString())
+                        .retrieve()
+                        .toEntity(Void.class)
+                        .block()
+                        .getStatusCode();
+            }
+            fail();
+        }
+        catch (WebClientResponseException.TooManyRequests ignored) {
+
+        }
+
     }
 }

@@ -37,7 +37,7 @@ public class LinkUpdaterScheduler {
                 GitHubResponse gitHubResponse = gitHubClient.getResponse(parts[4], parts[5]);
                 if (link.lastUpdate().isBefore(gitHubResponse.updatedAt())) {
                     botClient.sendUpdate(new BotRequest(link.id(), link.url(),
-                        "There are new updates on this link",
+                        "There are updates on this link",
                         linkService.listChatsForLink(link.id()).stream()
                             .map(ChatDTO::chatId)
                             .toList()));
@@ -51,7 +51,7 @@ public class LinkUpdaterScheduler {
                     parts[5].substring(0, parts[5].indexOf('?')));
                 if (link.lastUpdate().isBefore(stackOverflowResponse.lastActivityDate())) {
                     botClient.sendUpdate(new BotRequest(link.id(), link.url(),
-                        "There are new updates on this link",
+                        "There are updates on this link",
                         linkService.listChatsForLink(link.id()).stream()
                             .map(ChatDTO::chatId)
                             .toList()));

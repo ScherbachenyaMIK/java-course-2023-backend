@@ -1,4 +1,4 @@
-package edu.java.web;
+package edu.java.scrapper.web;
 
 import edu.java.DB.jdbc.DTO.LinkDTO;
 import edu.java.responseDTO.BotRequest;
@@ -6,6 +6,10 @@ import edu.java.responseDTO.GitHubResponse;
 import edu.java.responseDTO.StackOverflowResponse;
 import edu.java.scrapper.IntegrationTest;
 import edu.java.service.jdbc.JdbcLinkService;
+import edu.java.web.BotClient;
+import edu.java.web.GitHubClient;
+import edu.java.web.LinkUpdaterScheduler;
+import edu.java.web.StackOverflowClient;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.time.OffsetDateTime;

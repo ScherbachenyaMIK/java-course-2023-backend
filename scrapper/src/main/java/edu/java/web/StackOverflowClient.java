@@ -1,5 +1,6 @@
 package edu.java.web;
 
+import edu.java.annotation.ExponentialBackoffRetry;
 import edu.java.responseDTO.StackOverflowResponse;
 import edu.java.util.ClientErrorCode;
 import java.time.OffsetDateTime;
@@ -36,6 +37,7 @@ public class StackOverflowClient {
     }
 
     @SuppressWarnings("MultipleStringLiterals")
+    @ExponentialBackoffRetry
     public StackOverflowResponse getResponse(String id) {
         try {
         return webClient.get()

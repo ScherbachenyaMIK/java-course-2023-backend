@@ -36,6 +36,10 @@ public class ListCommand implements FunctionalCommand {
     public SendMessage handle(Update update) {
         // Writing of list of tracking links
         ListLinksResponse response = scrapperClient.getLinks(update.message().chat().id());
+        if (response.size() == 0) {
+            return new SendMessage(update.message().chat().id(),
+                "You haven't added any links yet");
+        }
         StringBuilder responseText = new StringBuilder("List of tracked links:\n\n");
         for (int i = 0; i < response.size(); ++i) {
             LinkResponse link = response.links().get(i);
