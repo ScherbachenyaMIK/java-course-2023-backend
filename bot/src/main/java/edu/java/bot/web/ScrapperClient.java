@@ -1,5 +1,6 @@
 package edu.java.bot.web;
 
+import edu.java.bot.annotation.LinearBackoffRetry;
 import edu.java.bot.model.requestDTO.LinkRequest;
 import edu.java.bot.model.responseDTO.ListLinksResponse;
 import java.util.Objects;
@@ -17,6 +18,7 @@ public class ScrapperClient {
         this.webClient = webClientBuilder.baseUrl(URL).build();
     }
 
+    @LinearBackoffRetry
     @SuppressWarnings("MultipleStringLiterals")
     public ListLinksResponse getLinks(Long id) {
         return webClient.get()
@@ -27,6 +29,7 @@ public class ScrapperClient {
             .block();
     }
 
+    @LinearBackoffRetry
     @SuppressWarnings("MultipleStringLiterals")
     public HttpStatusCode postTgChatId(Long id) {
         return Objects.requireNonNull(
@@ -39,6 +42,7 @@ public class ScrapperClient {
             .getStatusCode();
     }
 
+    @LinearBackoffRetry
     public HttpStatusCode deleteTgChatId(Long id) {
         return Objects.requireNonNull(
                 webClient.delete()
@@ -50,6 +54,7 @@ public class ScrapperClient {
             .getStatusCode();
     }
 
+    @LinearBackoffRetry
     public HttpStatusCode postLinks(Long id, LinkRequest link) {
         return Objects.requireNonNull(
                     webClient.post()
@@ -63,6 +68,7 @@ public class ScrapperClient {
             .getStatusCode();
     }
 
+    @LinearBackoffRetry
     public HttpStatusCode deleteLinks(Long id, LinkRequest link) {
         return Objects.requireNonNull(
                 webClient.method(HttpMethod.DELETE)

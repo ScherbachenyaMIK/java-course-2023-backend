@@ -1,5 +1,6 @@
 package edu.java.web;
 
+import edu.java.annotation.LinearBackoffRetry;
 import edu.java.responseDTO.BotRequest;
 import java.util.Objects;
 import org.springframework.http.HttpStatusCode;
@@ -14,6 +15,7 @@ public class BotClient {
         this.webClient = webClientBuilder.baseUrl(URL).build();
     }
 
+    @LinearBackoffRetry
     public HttpStatusCode sendUpdate(BotRequest botRequest) {
         return Objects.requireNonNull(
                 webClient.post()

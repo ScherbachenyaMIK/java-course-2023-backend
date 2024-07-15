@@ -1,5 +1,6 @@
 package edu.java.web;
 
+import edu.java.annotation.ExponentialBackoffRetry;
 import edu.java.responseDTO.GitHubResponse;
 import edu.java.util.ClientErrorCode;
 import java.time.OffsetDateTime;
@@ -36,6 +37,7 @@ public class GitHubClient {
     }
 
     @SuppressWarnings("MultipleStringLiterals")
+    @ExponentialBackoffRetry
     public GitHubResponse getResponse(String owner, String repo) {
         try {
             return webClient.get()

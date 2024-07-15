@@ -15,6 +15,28 @@ spring:
     driver-class-name: org.postgresql.Driver
   liquibase:
     enabled: false
+  retry-config:
+    constant-backoff-retry:
+      max-attempts-expression: 5
+      delay-expression: 1000
+    linear-backoff-retry:
+      max-attempts: 5
+      delay: 1000
+      max-delay: 3000
+      delay-scale: 1000
+    exponential-backoff-retry:
+      max-attempts-expression: 5
+      delay-expression: 1000
+      max-delay-expression: 5
+      multiplier-expression: 2
+    codes-for-retry:
+      [ 403, 404, 422, 500, 502, 503, 504 ]
+
+bucket4j:
+  config:
+    token-limit: 20
+    refill-count: 1
+    refill-duration: 2s
 
 server:
   port: 8080
