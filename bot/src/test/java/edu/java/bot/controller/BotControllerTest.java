@@ -4,9 +4,13 @@ import edu.java.bot.model.requestDTO.LinkUpdateRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class BotControllerTest {
 
@@ -70,6 +75,7 @@ public class BotControllerTest {
                 .block());
     }
 
+    @Order(Ordered.LOWEST_PRECEDENCE)
     @Test
     public void testProcessUpdateTooManyRequests() throws URISyntaxException {
         LinkUpdateRequest request = new LinkUpdateRequest(1L,

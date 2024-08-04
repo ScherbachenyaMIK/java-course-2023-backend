@@ -3,7 +3,7 @@ package edu.java.scrapper.web;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import edu.java.responseDTO.BotRequest;
-import edu.java.web.BotClient;
+import edu.java.web.BotHttpClient;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 public class RetryTest {
     @Autowired
-    BotClient botClient;
+    BotHttpClient botHttpClient;
     private static final int PORT = 8090;
     private static final String HOST = "localhost";
     private static final Long ID = 1L;
@@ -59,7 +59,7 @@ public class RetryTest {
                 ids
         );
 
-        assertThatThrownBy(() -> botClient.sendUpdate(request))
+        assertThatThrownBy(() -> botHttpClient.sendUpdate(request))
                 .isInstanceOf(WebClientResponseException.InternalServerError.class);
 
         verify(5, postRequestedFor(urlEqualTo("/updates")));
