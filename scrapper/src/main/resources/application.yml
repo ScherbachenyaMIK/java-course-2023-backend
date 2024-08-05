@@ -4,6 +4,14 @@ app:
     interval: 10
     force-check-delay: 10
   database-access-type: jpa
+  kafka-configuration:
+    topic-name: topic1
+    count-of-partitions: 10
+    count-of-replicas: 1
+    dlq-topic-name: topic1_dlq
+    dlq-count-of-partitions: 10
+    dlq-count-of-replicas: 1
+  use-queue: true
 
 spring:
   application:
@@ -31,6 +39,12 @@ spring:
       multiplier-expression: 2
     codes-for-retry:
       [ 403, 404, 422, 500, 502, 503, 504 ]
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      auto-offset-reset: earliest
+      group-id: group2
 
 bucket4j:
   config:

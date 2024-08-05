@@ -6,7 +6,7 @@ import edu.java.responseDTO.GitHubResponse;
 import edu.java.responseDTO.StackOverflowResponse;
 import edu.java.scrapper.IntegrationTest;
 import edu.java.service.jdbc.JdbcLinkService;
-import edu.java.web.BotClient;
+import edu.java.web.BotHttpClient;
 import edu.java.web.GitHubClient;
 import edu.java.web.LinkUpdaterScheduler;
 import edu.java.web.StackOverflowClient;
@@ -36,7 +36,7 @@ class LinkUpdaterSchedulerTest extends IntegrationTest {
     private JdbcLinkService jdbcLinkService;
 
     @Mock
-    private BotClient botClient;
+    private BotHttpClient botHttpClient;
 
     @InjectMocks
     private LinkUpdaterScheduler linkUpdaterScheduler;
@@ -61,8 +61,8 @@ class LinkUpdaterSchedulerTest extends IntegrationTest {
 
         Field field = linkUpdaterScheduler.getClass().getDeclaredField("botClient");
         field.setAccessible(true);
-        BotClient botClient = (BotClient) field.get(linkUpdaterScheduler);
-        verify(botClient, times(1)).sendUpdate(any(BotRequest.class));
+        BotHttpClient botHttpClient = (BotHttpClient) field.get(linkUpdaterScheduler);
+        verify(botHttpClient, times(1)).sendUpdate(any(BotRequest.class));
     }
 
     @Test
@@ -80,8 +80,8 @@ class LinkUpdaterSchedulerTest extends IntegrationTest {
 
         Field field = linkUpdaterScheduler.getClass().getDeclaredField("botClient");
         field.setAccessible(true);
-        BotClient botClient = (BotClient) field.get(linkUpdaterScheduler);
-        verify(botClient, times(1)).sendUpdate(any(BotRequest.class));
+        BotHttpClient botHttpClient = (BotHttpClient) field.get(linkUpdaterScheduler);
+        verify(botHttpClient, times(1)).sendUpdate(any(BotRequest.class));
     }
 }
 

@@ -3,7 +3,7 @@ package edu.java.scrapper.web;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import edu.java.responseDTO.BotRequest;
-import edu.java.web.BotClient;
+import edu.java.web.BotHttpClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class BotClientTest {
+class BotHttpClientTest {
 
-    BotClient botClient = new BotClient(WebClient.builder(), "http://localhost:8090");
+    BotHttpClient botHttpClient = new BotHttpClient(WebClient.builder(), "http://localhost:8090");
     private static final int PORT = 8090;
     private static final String HOST = "localhost";
     private static final Long ID = 1L;
@@ -58,7 +58,7 @@ class BotClientTest {
         );
         HttpStatusCode expected = HttpStatus.OK;
 
-        HttpStatusCode result = botClient.sendUpdate(request);
+        HttpStatusCode result = botHttpClient.sendUpdate(request);
 
         assertEquals(expected, result);
     }
@@ -72,7 +72,7 @@ class BotClientTest {
             ));
         HttpStatusCode expected = HttpStatus.OK;
 
-        HttpStatusCode result = botClient.sendUpdate(new BotRequest(
+        HttpStatusCode result = botHttpClient.sendUpdate(new BotRequest(
             1L,
             null,
             "New commit pushed",

@@ -15,6 +15,29 @@ jobs:
       packages: write
       pull-requests: write 
 
+    services:
+      zookeeper:
+        image: confluentinc/cp-zookeeper:7.3.2
+        ports:
+          - 2181:2181
+        env:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_SERVER_ID: 1
+          ZOOKEEPER_SERVERS: zookeeper:2888:3888
+        options: >-
+          --network-alias zookeeper
+
+      kafka:
+        image: confluentinc/cp-kafka:7.3.2
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        options: >-
+          --network-alias kafka
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -22,6 +45,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+
+      - name: Wait for Zookeeper
+        run: until nc -z -v -w30 localhost 2181; do echo 'waiting for zookeeper'; sleep 5; done
+
+      - name: Wait for Kafka
+        run: until nc -z -v -w30 localhost 9092; do echo 'waiting for kafka'; sleep 5; done
 
       - name: maven build
         env:

@@ -1,9 +1,8 @@
 package edu.java.bot.controller;
 
-import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.model.requestDTO.LinkUpdateRequest;
 import edu.java.bot.model.responseDTO.ApiErrorResponse;
-import edu.java.bot.service.CustomTelegramBot;
+import edu.java.bot.service.MessageSender;
 import io.github.bucket4j.Bucket;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,8 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BotController {
     @Autowired
-    CustomTelegramBot telegramBot;
-
+    MessageSender messageSender;
     @Autowired
     Bucket bucket;
 
@@ -35,14 +33,7 @@ public class BotController {
     @PostMapping("/updates")
     public ResponseEntity<?> processUpdate(@Valid @RequestBody LinkUpdateRequest linkUpdateRequest) {
         if (bucket.tryConsume(1)) {
-            for (Long chatId : linkUpdateRequest.tgChatIds()) {
-                telegramBot.execute(new SendMessage(
-                    chatId,
-                    linkUpdateRequest.url().toString()
-                        + "\n"
-                        + linkUpdateRequest.description()
-                ));
-            }
+            messageSender.sendMessage(linkUpdateRequest);
             return ResponseEntity.ok().build();
         }
 

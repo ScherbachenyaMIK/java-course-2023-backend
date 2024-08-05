@@ -1,5 +1,12 @@
 app:
   telegram-token: ${TELEGRAM_TOKEN}
+  kafka-configuration:
+    topic-name: topic1
+    count-of-partitions: 10
+    count-of-replicas: 1
+    dlq-topic-name: topic1_dlq
+    dlq-count-of-partitions: 10
+    dlq-count-of-replicas: 1
 
 spring:
   application:
@@ -22,6 +29,16 @@ spring:
       multiplier-expression: 2
     codes-for-retry:
       [ 403, 404, 422, 500, 502, 503, 504 ]
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      group-id: group1
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            use.type.headers: false
+            value.default.type: edu.java.bot.model.requestDTO.LinkUpdateRequest
 
 bucket4j:
   config:
