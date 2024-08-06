@@ -6,6 +6,8 @@ import edu.java.bot.model.requestDTO.LinkRequest;
 import edu.java.bot.util.CommandErrorCode;
 import edu.java.bot.util.Link;
 import edu.java.bot.web.ScrapperClient;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,23 @@ public class UntrackCommand implements FunctionalCommand {
     private ScrapperClient scrapperClient;
     @Autowired
     ListCommand listCommand;
+
+    private final Counter counter;
+
+    public UntrackCommand(Counter counter, ScrapperClient scrapperClient) {
+        this.scrapperClient = scrapperClient;
+        this.counter = counter;
+    }
+
+    @Autowired
+    public UntrackCommand(MeterRegistry meterRegistry) {
+        counter = Counter
+            .builder("Telegram_messages_handled_total")
+            .description("Counts how many times the /untrack command has been processed")
+            .tags("command", command())
+            .register(meterRegistry);
+    }
+
 
     @Override
     public String command() {
@@ -44,6 +63,7 @@ public class UntrackCommand implements FunctionalCommand {
     @Override
     @SuppressWarnings("MagicNumber")
     public SendMessage handle(Update update) {
+        counter.increment();
         // End tracking link
         String url = update.message().text().substring(9);
         try {
@@ -88,6 +108,7 @@ public class UntrackCommand implements FunctionalCommand {
 
     @Override
     public SendMessage handleNotSupports(Update update, String exitCode) {
+        counter.increment();
         // Taking message in accordance with exit code
         String message = commandErrorCode.getCommandErrorCode(exitCode);
         if (exitCode.equals("EXIT_CODE_4")) {

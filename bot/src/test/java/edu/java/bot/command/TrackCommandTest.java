@@ -6,6 +6,7 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.model.requestDTO.LinkRequest;
 import edu.java.bot.web.ScrapperClient;
+import io.micrometer.core.instrument.Counter;
 import java.net.URI;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,6 +21,8 @@ import static org.mockito.Mockito.when;
 class TrackCommandTest {
     @Mock
     ScrapperClient scrapperClient;
+    @Mock
+    Counter counter;
     @InjectMocks
     TrackCommand trackCommand;
 

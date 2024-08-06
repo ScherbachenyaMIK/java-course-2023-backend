@@ -187,8 +187,8 @@ public class LinkDAOTest extends IntegrationTest {
         LinkDTO thirdLink = connectionLink.findLinkByURI(
             URI.create("https://api.github.com/repos/ScherbachenyaMIK/java-course-2023-backend"));
 
-        connectionLink.updateLink(firstLink.id(), now, now.minusMinutes(3));
-        connectionLink.updateLink(secondLink.id(), now, now.minusMinutes(4));
+        connectionLink.updateLink(firstLink.id(), now, now.minusMinutes(7));
+        connectionLink.updateLink(secondLink.id(), now, now.minusMinutes(8));
         connectionLink.updateLink(thirdLink.id(), now, now.plusHours(1));
 
         firstLink = connectionLink.findLinkByURI(

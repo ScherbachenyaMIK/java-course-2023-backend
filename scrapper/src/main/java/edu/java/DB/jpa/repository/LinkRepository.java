@@ -26,7 +26,7 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
     @Query(value = """
             SELECT *
             FROM link
-            WHERE last_seen < NOW() - INTERVAL '1' MINUTE
+            WHERE last_seen < NOW() - INTERVAL '5' MINUTE
             """, nativeQuery = true)
     List<Link> findAllLinksWithFilter();
 

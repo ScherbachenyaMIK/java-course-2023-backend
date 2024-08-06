@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.model.responseDTO.LinkResponse;
 import edu.java.bot.model.responseDTO.ListLinksResponse;
 import edu.java.bot.web.ScrapperClient;
+import io.micrometer.core.instrument.Counter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,8 @@ import static org.mockito.Mockito.when;
 class ListCommandTest {
     @Mock
     ScrapperClient scrapperClient;
+    @Mock
+    Counter counter;
     @InjectMocks
     ListCommand listCommand;
 

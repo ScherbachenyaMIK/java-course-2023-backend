@@ -4,22 +4,24 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import io.micrometer.core.instrument.Counter;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UnknownCommandTest {
+    Counter counter = mock(Counter.class);
 
     @Test
     public void testCommand() {
-        UnknownCommand unknownCommand = new UnknownCommand();
+        UnknownCommand unknownCommand = new UnknownCommand(counter);
         assertEquals("/", unknownCommand.command());
     }
 
     @Test
     public void testHandle() {
-        UnknownCommand unknownCommand = new UnknownCommand();
+        UnknownCommand unknownCommand = new UnknownCommand(counter);
 
         Update mockUpdate = mock(Update.class);
         Message mockMessage = mock(Message.class);

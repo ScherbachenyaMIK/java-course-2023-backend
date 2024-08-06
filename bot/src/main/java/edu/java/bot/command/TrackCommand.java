@@ -6,6 +6,8 @@ import edu.java.bot.model.requestDTO.LinkRequest;
 import edu.java.bot.util.CommandErrorCode;
 import edu.java.bot.util.Link;
 import edu.java.bot.web.ScrapperClient;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,22 @@ public class TrackCommand implements FunctionalCommand {
     private ScrapperClient scrapperClient;
     @Autowired
     private CommandErrorCode commandErrorCode;
+
+    private final Counter counter;
+
+    public TrackCommand(Counter counter, ScrapperClient scrapperClient) {
+        this.scrapperClient = scrapperClient;
+        this.counter = counter;
+    }
+
+    @Autowired
+    public TrackCommand(MeterRegistry meterRegistry) {
+        counter = Counter
+            .builder("Telegram_messages_handled_total")
+            .description("Counts how many times the /track command has been processed")
+            .tags("command", command())
+            .register(meterRegistry);
+    }
 
     @Override
     public String command() {
@@ -41,6 +59,7 @@ public class TrackCommand implements FunctionalCommand {
     @Override
     @SuppressWarnings("MagicNumber")
     public SendMessage handle(Update update) {
+        counter.increment();
         // Start tracking link
         String url = update.message().text().substring(7);
         try {
@@ -75,6 +94,7 @@ public class TrackCommand implements FunctionalCommand {
 
     @Override
     public SendMessage handleNotSupports(Update update, String exitCode) {
+        counter.increment();
         // Taking message in accordance with exit code
         String message = commandErrorCode.getCommandErrorCode(exitCode);
         return new SendMessage(update.message().chat().id(), message);
