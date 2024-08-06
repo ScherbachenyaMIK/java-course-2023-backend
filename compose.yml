@@ -11,7 +11,7 @@ services:
       - postgresql:/var/lib/postgresql/data
     networks:
       - backend
-      
+
   liquibase-migrations:
     image: liquibase/liquibase:4.25
     depends_on:
@@ -26,8 +26,8 @@ services:
     volumes:
         - ./migrations:/liquibase/changelog
     networks:
-        - backend  
-  
+        - backend
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
     hostname: zookeeper
@@ -42,7 +42,7 @@ services:
       - zookeeper_data:/var/lib/zookeeper
     networks:
       - backend
-      
+
   kafka:
     image: confluentinc/cp-kafka:7.3.2
     hostname: kafka
@@ -72,10 +72,35 @@ services:
     networks:
       - backend
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana:/var/lib/grafana
+    networks:
+      - backend
+
 volumes:
   postgresql: { }
   zookeeper_data: { }
   kafka_data: { }
+  prometheus: { }
+  grafana: { }
 
 networks:
   backend: { }

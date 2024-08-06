@@ -3,6 +3,8 @@ package edu.java.bot.command;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.web.ScrapperClient;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,22 @@ import org.springframework.stereotype.Component;
 public class StartCommand implements FunctionalCommand {
     @Autowired
     private ScrapperClient scrapperClient;
+
+    private final Counter counter;
+
+    public StartCommand(Counter counter, ScrapperClient scrapperClient) {
+        this.scrapperClient = scrapperClient;
+        this.counter = counter;
+    }
+
+    @Autowired
+    public StartCommand(MeterRegistry meterRegistry) {
+        counter = Counter
+            .builder("Telegram_messages_handled_total")
+            .description("Counts how many times the /start command has been processed")
+            .tags("command", command())
+            .register(meterRegistry);
+    }
 
     @Override
     public String command() {
@@ -33,6 +51,7 @@ public class StartCommand implements FunctionalCommand {
 
     @Override
     public SendMessage handle(Update update) {
+        counter.increment();
         // User logging
         if (scrapperClient.postTgChatId(update.message().chat().id()) != HttpStatus.OK) {
             return new SendMessage(update.message().chat().id(),

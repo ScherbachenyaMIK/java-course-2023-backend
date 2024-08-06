@@ -269,8 +269,8 @@ class LinkRepositoryTest extends IntegrationTest {
         link3.setLastUpdate(Timestamp.from(OffsetDateTime.now().toInstant()));
 
         link1.setLastSeen(Timestamp.from(OffsetDateTime.now().plusHours(1).toInstant()));
-        link2.setLastSeen(Timestamp.from(OffsetDateTime.now().minusMinutes(3).toInstant()));
-        link3.setLastSeen(Timestamp.from(OffsetDateTime.now().minusMinutes(4).toInstant()));
+        link2.setLastSeen(Timestamp.from(OffsetDateTime.now().minusMinutes(7).toInstant()));
+        link3.setLastSeen(Timestamp.from(OffsetDateTime.now().minusMinutes(8).toInstant()));
 
         linkRepository.save(link1);
         linkRepository.save(link2);

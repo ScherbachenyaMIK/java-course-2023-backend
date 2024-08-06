@@ -81,7 +81,7 @@ public class LinkDAO {
     }
 
     public List<LinkDTO> findAllLinksWithFilter() {
-        return jdbcTemplate.query("SELECT * FROM Link WHERE last_seen < NOW() - INTERVAL '1 minutes'",
+        return jdbcTemplate.query("SELECT * FROM Link WHERE last_seen < NOW() - INTERVAL '5 minutes'",
             (rs, rowNum) -> {
                 try {
                     return new LinkDTO(

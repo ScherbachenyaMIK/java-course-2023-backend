@@ -6,6 +6,7 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.web.ScrapperClient;
+import io.micrometer.core.instrument.Counter;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,6 +23,8 @@ class StopCommandTest {
 
     @Mock
     ScrapperClient scrapperClient;
+    @Mock
+    Counter counter;
     @InjectMocks
     StopCommand stopCommand;
 

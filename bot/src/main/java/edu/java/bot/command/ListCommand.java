@@ -5,6 +5,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.model.responseDTO.LinkResponse;
 import edu.java.bot.model.responseDTO.ListLinksResponse;
 import edu.java.bot.web.ScrapperClient;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,22 @@ import org.springframework.stereotype.Component;
 public class ListCommand implements FunctionalCommand {
     @Autowired
     private ScrapperClient scrapperClient;
+
+    private final Counter counter;
+
+    public ListCommand(Counter counter, ScrapperClient scrapperClient) {
+        this.scrapperClient = scrapperClient;
+        this.counter = counter;
+    }
+
+    @Autowired
+    public ListCommand(MeterRegistry meterRegistry) {
+        counter = Counter
+            .builder("Telegram_messages_handled_total")
+            .description("Counts how many times the /list command has been processed")
+            .tags("command", command())
+            .register(meterRegistry);
+    }
 
     @Override
     public String command() {
@@ -34,6 +52,7 @@ public class ListCommand implements FunctionalCommand {
 
     @Override
     public SendMessage handle(Update update) {
+        counter.increment();
         // Writing of list of tracking links
         ListLinksResponse response = scrapperClient.getLinks(update.message().chat().id());
         if (response.size() == 0) {
