@@ -7,13 +7,17 @@ on:
       - .github/workflows/bot.yml
       - bot/**
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.actor }}/bot
+
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Build
     permissions:
       packages: write
-      pull-requests: write 
+      pull-requests: write
 
     services:
       zookeeper:
@@ -56,6 +60,29 @@ jobs:
         env:
             TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: mvn -pl bot -am package
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./bot
+          file: ./bot/bot.Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       - id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
