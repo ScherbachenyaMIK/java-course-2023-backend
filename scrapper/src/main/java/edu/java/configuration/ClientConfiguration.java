@@ -7,14 +7,19 @@ import edu.java.web.BotHttpClient;
 import edu.java.web.GitHubClient;
 import edu.java.web.ScrapperQueueProducer;
 import edu.java.web.StackOverflowClient;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
+@ConfigurationProperties(prefix = "bot")
 public class ClientConfiguration {
+    @Setter
+    private String baseUrl;
     @Autowired
     ApplicationConfig applicationConfig;
 
@@ -41,7 +46,7 @@ public class ClientConfiguration {
         if (applicationConfig.useQueue()) {
             return new ScrapperQueueProducer(kafkaTemplate, applicationConfig, kafkaProducerLogger());
         } else {
-            return new BotHttpClient(webClientBuilder, "http://localhost:8090");
+            return new BotHttpClient(webClientBuilder, baseUrl);
         }
     }
 }

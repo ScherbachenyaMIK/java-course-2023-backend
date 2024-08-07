@@ -58,7 +58,11 @@ jobs:
 
       - name: maven build
         env:
-            TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          BOT_TOKEN_LIMIT: 20
+          BOT_REFILL_COUNT: 1
+          BOT_REFILL_DURATION: 2s
+          SCRAPPER_BASEURL_HOST: localhost
         run: mvn -pl bot -am package
 
       - name: Log in to the Container registry

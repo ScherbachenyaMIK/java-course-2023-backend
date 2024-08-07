@@ -75,6 +75,12 @@ jobs:
         run: until nc -z -v -w30 localhost 9092; do echo 'waiting for kafka'; sleep 5; done
 
       - name: maven build
+        env:
+          SCRAPPER_DATABASE_ACCESS_TYPE: jpa
+          SCRAPPER_TOKEN_LIMIT: 20
+          SCRAPPER_REFILL_COUNT: 1
+          SCRAPPER_REFILL_DURATION: 2s
+          BOT_BASEURL_HOST: localhost
         run: mvn -pl scrapper -am package
 
       - name: Log in to the Container registry

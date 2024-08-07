@@ -3,7 +3,7 @@ app:
     enable: true
     interval: 10
     force-check-delay: 10
-  database-access-type: jpa
+  database-access-type: ${SCRAPPER_DATABASE_ACCESS_TYPE}
   kafka-configuration:
     topic-name: topic1
     count-of-partitions: 10
@@ -48,9 +48,9 @@ spring:
 
 bucket4j:
   config:
-    token-limit: 20
-    refill-count: 1
-    refill-duration: 2s
+    token-limit: ${SCRAPPER_TOKEN_LIMIT}
+    refill-count: ${SCRAPPER_REFILL_COUNT}
+    refill-duration: ${SCRAPPER_REFILL_DURATION}
 
 server:
   port: 8080
@@ -63,7 +63,7 @@ springdoc:
     path: /swagger-ui
 
 bot:
-  baseUrl: http://localhost:8090
+  base-url: http://${BOT_BASEURL_HOST}:8090
 
 management:
   endpoints:
