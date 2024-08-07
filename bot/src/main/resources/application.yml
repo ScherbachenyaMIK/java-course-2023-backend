@@ -42,9 +42,9 @@ spring:
 
 bucket4j:
   config:
-    token-limit: 20
-    refill-count: 1
-    refill-duration: 2s
+    token-limit: ${BOT_TOKEN_LIMIT}
+    refill-count: ${BOT_REFILL_COUNT}
+    refill-duration: ${BOT_REFILL_DURATION}
 
 server:
   port: 8090
@@ -57,7 +57,7 @@ springdoc:
     path: /swagger-ui
 
 scrapper:
-  baseUrl: http://localhost:8080
+  base-url: http://${SCRAPPER_BASEURL_HOST}:8080
 
 management:
   endpoints:
